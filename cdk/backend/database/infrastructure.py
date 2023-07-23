@@ -10,6 +10,7 @@ class eShadhinDatabase(Construct):
         super().__init__(scope, id)
         # product table
         self.product_table = self.create_product_table()
+        
     
     def create_product_table(self):
         table = dynamodb.Table(
@@ -20,6 +21,7 @@ class eShadhinDatabase(Construct):
                 type=dynamodb.AttributeType.STRING
             ),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-            removal_policy=cdk.RemovalPolicy.DESTROY
+            removal_policy=cdk.RemovalPolicy.DESTROY,
+            
         )
         return table
