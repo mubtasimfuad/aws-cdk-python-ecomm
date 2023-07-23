@@ -1,0 +1,62 @@
+*.swp
+package-lock.json
+.pytest_cache
+*.egg-info
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# CDK Context & Staging files
+.cdk.staging/
+cdk.out/
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+
+# Ignore CDK output files
+cdk.out/
+cdk.context.json
+
+# Ignore local development files
+.env
+.vscode/
+
+# Ignore Python virtual environment
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Ignore any local IDE or editor settings
+*.sublime-*
+*.swp
+*.swo
+*.DS_Store
+
+# Ignore log files
+*.log
+logs/
+
+# Ignore API Gateway and CloudFormation cache
+.cdk.staging
+.cdk.local
+.cdk.cdk.staging
+
+# Ignore other build and output files
+node_modules/
+npm-debug.log
+yarn-error.log
+*.lock
+*.zip
