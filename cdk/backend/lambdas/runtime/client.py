@@ -1,3 +1,7 @@
 # add dyanomo db client
 import boto3 as client
-client = client.resource('dynamodb')
+
+
+
+ddb_client = client.resource('dynamodb')
+event_bridge_client = client.client("events")

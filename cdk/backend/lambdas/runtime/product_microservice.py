@@ -2,7 +2,7 @@ import json
 import os
 import uuid
 import traceback
-from client import client
+from client import ddb_client as client
 
 
 table_name = os.environ["PRODUCT_TABLE_NAME"]
