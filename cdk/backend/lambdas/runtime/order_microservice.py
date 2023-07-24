@@ -3,8 +3,8 @@ from botocore.exceptions import ClientError
 import datetime
 import os
 import traceback
-from client import ddb_res_client
-from utils import DecimalEncoder
+from client import ddb_res_client,ddb_client
+from utils import DecimalEncoder, convert_to_python
 
 
 def lambda_handler(event, context):
@@ -41,24 +41,40 @@ def event_bridge_invocation(event):
 
 def create_order(basket_checkout_event):
     try:
-        print("createOrder function. event :", json.dumps(basket_checkout_event))
+        print("createOrder function. event:", json.dumps(basket_checkout_event))
 
+        # Extract the basket items as a list of dictionaries
+        basket_items = basket_checkout_event["items"]
+
+        print("basket_checkout_event :", json.dumps(basket_checkout_event))
         # Set orderDate for SK of order DynamoDB
-        orderDate = datetime.utcnow().isoformat()
+        orderDate = datetime.datetime.utcnow().isoformat()
         basket_checkout_event["orderDate"] = orderDate
 
-        params = {
-            "TableName": os.environ["DYNAMODB_TABLE_NAME"],
-            "Item": basket_checkout_event,
+        # Your code to put_item into DynamoDB using the ddb_res_client
+        order_table = ddb_res_client.Table(os.environ["DYNAMODB_TABLE_NAME"])
+        response = order_table.put_item(Item=basket_checkout_event)
+        print("PutItem response:", response)
+
+        return "Order created successfully."
+
+    except Exception as e:
+        print(e)
+        return {
+            "statusCode": 500,
+            "body": json.dumps(
+                {
+                    "message": "Failed to perform operation.",
+                    "errorMsg": str(e),
+                    "errorStack": traceback.format_exc(),
+                }
+            ),
         }
 
-        response = ddb_res_client.put_item(**params)
-        print(response)
-        return response
 
-    except ClientError as e:
-        print(e)
-        raise e
+        # Create order item into DB by dd resource client
+        
+
 
 
 def api_gateway_invocation(event):
@@ -95,35 +111,51 @@ def get_order(event):
         userName = event["pathParameters"]["userName"]
         orderDate = event["queryStringParameters"]["orderDate"]
 
-        params = {
-            "KeyConditionExpression": "userName = :userName and orderDate = :orderDate",
-            "ExpressionAttributeValues": {
-                ":userName": userName,
-                ":orderDate": orderDate,
-            },
-            "TableName": os.environ["DYNAMODB_TABLE_NAME"],
-        }
+        # Get the order table using the ddb_res_client (ServiceResource)
+        order_table = ddb_res_client.Table(os.environ["DYNAMODB_TABLE_NAME"])
 
-        response = ddb_res_client.query(**params)
+        # Perform the query using the table resource
+        response = order_table.query(
+            KeyConditionExpression="userName = :userName and orderDate = :orderDate",
+            ExpressionAttributeValues={":userName": userName, ":orderDate": orderDate},
+        )
+
         items = response.get("Items", [])
-
         return {"statusCode": 200, "body": json.dumps(items, cls=DecimalEncoder)}
 
-    except ClientError as e:
+    except Exception as e:
         print(e)
-        raise e
+        return {
+            "statusCode": 500,
+            "body": json.dumps(
+                {"message": "Failed to perform operation.", "errorMsg": str(e)}
+            ),
+        }
+
+
+    
 
 
 def get_all_orders():
     print("getAllOrders")
     try:
-        params = {"TableName": os.environ["DYNAMODB_TABLE_NAME"]}
-
-        response = ddb_res_client.scan(**params)
+        table_name = os.environ["DYNAMODB_TABLE_NAME"]
+        table = ddb_res_client.Table(table_name)
+        response = table.scan()
         items = response.get("Items", [])
+        
 
         return {"statusCode": 200, "body": json.dumps(items, cls=DecimalEncoder)}
 
-    except ClientError as e:
+    except Exception as e:
         print(e)
-        raise e
+        return {
+            "statusCode": 500,
+            "body": json.dumps(
+                {
+                    "message": "Failed to perform operation.",
+                    "errorMsg": str(e),
+                    "errorStack": traceback.format_exc(),
+                }
+            ),
+        }

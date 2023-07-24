@@ -42,7 +42,7 @@ class eShadhinLambda(Construct):
                 "DYNAMODB_TABLE_NAME": basket_table.table_name,
                 "EVENT_SOURCE": "com.shadhin.basket.checkoutbasket",
                 "EVENT_DETAILTYPE": "CheckoutBasket",
-                "EVENT_BUSNAME": "ShadhinEventBus",
+                "EVENT_BUSNAME": "eShadhinEventBus",
             },
         )
 

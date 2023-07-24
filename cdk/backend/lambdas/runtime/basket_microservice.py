@@ -1,6 +1,6 @@
 import json
 import os
-from client import ddb_client, event_bridge_client
+from client import ddb_client, ddb_res_client, event_bridge_client, ddb_type
 import traceback
 from utils import DecimalEncoder
 
@@ -54,22 +54,21 @@ def lambda_handler(event, context):
             ),
         }
 
-
 def get_basket(user_name):
     print("getBasket")
     try:
-        params = {
-            "TableName": os.environ["DYNAMODB_TABLE_NAME"],
-            "Key": {"userName": {"S": user_name}},
-        }
-        response = ddb_client.get_item(**params)
+        # Get the DynamoDB table
+        table_name = os.environ["DYNAMODB_TABLE_NAME"]
+        table = ddb_res_client.Table(table_name)
+
+        # Use the table's get_item method to retrieve the item
+        response = table.get_item(Key={"userName": user_name})
         item = response.get("Item")
         return item if item is not None else {}
 
     except Exception as e:
         print(e)
         raise e
-
 
 def get_all_baskets():
     print("getAllBaskets")
@@ -89,10 +88,30 @@ def create_basket(event):
     print("createBasket function. event:", event)
     try:
         request_body = json.loads(event["body"])
+        user_name = request_body.get("userName", "")
+        items = request_body.get("items", [])
+
+        basket_data = {
+            "userName": {"S": user_name},
+            "items": {"L": [
+                {
+                    "M": {
+                        "quantity": {"N": str(item.get("quantity", 0))},
+                        "color": {"S": item.get("color", "")},
+                        "price": {"N": str(item.get("price", 0))},
+                        "productId": {"S": item.get("productId", "")},
+                        "productName": {"S": item.get("productName", "")},
+                    }
+                }
+                for item in items
+            ]},
+        }
+
         params = {
             "TableName": os.environ["DYNAMODB_TABLE_NAME"],
-            "Item": {"userName": {"S": request_body.get("userName", "")}},
+            "Item": basket_data,
         }
+        
         response = ddb_client.put_item(**params)
         print(response)
         return response
@@ -150,14 +169,18 @@ def prepare_order_payload(checkout_request, basket):
         # Calculate totalPrice
         total_price = 0
         for item in basket["items"]:
-            total_price += item["price"]
+            # Access nested attributes using DynamoDB types
+            price = int(item["price"])
+            total_price += price
 
         checkout_request["totalPrice"] = total_price
         print(checkout_request)
 
-        # Copies all properties from basket into checkout_request
-        for key, value in basket.items():
-            checkout_request[key] = value
+        # Extract the basket items as a list of dictionaries
+        basket_items = basket["items"]
+
+        # Update the basket dictionary with the extracted items
+        checkout_request["items"] = basket_items
 
         print("Success prepareOrderPayload, orderPayload:", checkout_request)
         return checkout_request
@@ -165,6 +188,8 @@ def prepare_order_payload(checkout_request, basket):
     except Exception as e:
         print(e)
         raise e
+
+
 
 
 def publish_checkout_basket_event(checkout_payload):
@@ -175,7 +200,7 @@ def publish_checkout_basket_event(checkout_payload):
             "Entries": [
                 {
                     "Source": os.environ["EVENT_SOURCE"],
-                    "Detail": json.dumps(checkout_payload),
+                    "Detail": json.dumps(checkout_payload, cls=DecimalEncoder),
                     "DetailType": os.environ["EVENT_DETAILTYPE"],
                     "EventBusName": os.environ["EVENT_BUSNAME"],
                 },
