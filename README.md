@@ -1,4 +1,4 @@
-# AWS CDK Python Ecommerce Project :rocket:
+# AWS CDK Python Ecommerce Project :shopping_cart: :rocket:
 
 This repository contains an Ecommerce application built using AWS Cloud Development Kit (CDK) and Python. The application leverages various AWS services to provide functionalities like managing product inventory, processing orders, and handling user interactions.
 
