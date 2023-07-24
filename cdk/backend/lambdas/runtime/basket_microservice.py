@@ -1,8 +1,8 @@
 import json
-import boto3
 import os
 from client import ddb_client, event_bridge_client
 import traceback
+from utils import DecimalEncoder
 
 def handler(event, context):
     print("request:", json.dumps(event, indent=2))
@@ -35,7 +35,8 @@ def handler(event, context):
                 {
                     "message": f"Successfully finished operation: {http_method}",
                     "body": body,
-                }
+                },
+                cls=DecimalEncoder,
             ),
         }
 

@@ -4,6 +4,8 @@ import datetime
 import os
 import traceback
 from client import ddb_client
+from utils import DecimalEncoder
+
 
 def handler(event, context):
     print("request:", json.dumps(event, indent=2))
@@ -105,7 +107,7 @@ def get_order(event):
         response = ddb_client.query(**params)
         items = response.get("Items", [])
 
-        return {"statusCode": 200, "body": json.dumps(items)}
+        return {"statusCode": 200, "body": json.dumps(items, cls=DecimalEncoder)}
 
     except ClientError as e:
         print(e)
@@ -120,7 +122,7 @@ def get_all_orders():
         response = ddb_client.scan(**params)
         items = response.get("Items", [])
 
-        return {"statusCode": 200, "body": json.dumps(items)}
+        return {"statusCode": 200, "body": json.dumps(items, cls=DecimalEncoder)}
 
     except ClientError as e:
         print(e)

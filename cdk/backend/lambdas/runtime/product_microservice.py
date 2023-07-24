@@ -3,7 +3,7 @@ import os
 import uuid
 import traceback
 from client import ddb_client as client
-
+from utils import DecimalEncoder
 
 table_name = os.environ["PRODUCT_TABLE_NAME"]
 table = client.Table(table_name)
@@ -42,7 +42,9 @@ def lambda_handler(event, context):
                 {
                     "message": f'Successfully finished operation: "{http_method}"',
                     "body": body,
-                }
+                },
+                cls=DecimalEncoder,
+                
             ),
         }
 
