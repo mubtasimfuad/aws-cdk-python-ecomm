@@ -3,11 +3,11 @@ from botocore.exceptions import ClientError
 import datetime
 import os
 import traceback
-from client import ddb_client
+from client import ddb_res_client
 from utils import DecimalEncoder
 
 
-def handler(event, context):
+def lambda_handler(event, context):
     print("request:", json.dumps(event, indent=2))
 
     if "Records" in event:
@@ -52,7 +52,7 @@ def create_order(basket_checkout_event):
             "Item": basket_checkout_event,
         }
 
-        response = ddb_client.put_item(**params)
+        response = ddb_res_client.put_item(**params)
         print(response)
         return response
 
@@ -104,7 +104,7 @@ def get_order(event):
             "TableName": os.environ["DYNAMODB_TABLE_NAME"],
         }
 
-        response = ddb_client.query(**params)
+        response = ddb_res_client.query(**params)
         items = response.get("Items", [])
 
         return {"statusCode": 200, "body": json.dumps(items, cls=DecimalEncoder)}
@@ -119,7 +119,7 @@ def get_all_orders():
     try:
         params = {"TableName": os.environ["DYNAMODB_TABLE_NAME"]}
 
-        response = ddb_client.scan(**params)
+        response = ddb_res_client.scan(**params)
         items = response.get("Items", [])
 
         return {"statusCode": 200, "body": json.dumps(items, cls=DecimalEncoder)}

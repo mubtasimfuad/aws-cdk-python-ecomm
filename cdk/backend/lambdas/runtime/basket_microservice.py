@@ -4,7 +4,8 @@ from client import ddb_client, event_bridge_client
 import traceback
 from utils import DecimalEncoder
 
-def handler(event, context):
+
+def lambda_handler(event, context):
     print("request:", json.dumps(event, indent=2))
 
     try:
@@ -74,6 +75,7 @@ def get_all_baskets():
     print("getAllBaskets")
     try:
         params = {"TableName": os.environ["DYNAMODB_TABLE_NAME"]}
+        print("params", params)
         response = ddb_client.scan(**params)
         items = response.get("Items")
         return items if items is not None else []

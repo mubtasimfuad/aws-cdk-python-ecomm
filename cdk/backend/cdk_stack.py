@@ -17,7 +17,7 @@ class CdkStack(Stack):
 
         lambdas = eShadhinLambda(self, "eShadhinLambda", db=database)
 
-        product_apigw = eShadhinApi(self, "eShadhinApi", lambdas=lambdas.product_lambda)
+        product_apigw = eShadhinApi(self, "eShadhinApi", lambdas=lambdas)
         queue = eShadhinSQSQueue(self, "eShadhinSQSQueue", lambdas=lambdas)
         # ad environment variable to lambda
         lambdas.product_lambda.add_environment(

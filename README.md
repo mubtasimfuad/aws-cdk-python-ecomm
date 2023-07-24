@@ -2,6 +2,8 @@
 
 This repository contains an Ecommerce application built using AWS Cloud Development Kit (CDK) and Python. The application leverages various AWS services to provide functionalities like managing product inventory, processing orders, and handling user interactions.
 
+![alt The CDK ECOMMERCE FLOW](https://user-images.githubusercontent.com/1147445/158019166-96732203-6642-4242-b1d9-d53ece2e1ed3.png)
+
 ## Getting Started
 
 To get started with the project, follow the steps below:

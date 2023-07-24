@@ -18,7 +18,7 @@ class eShadhinApi(Construct):
         product_api = cdk.aws_apigateway.LambdaRestApi(
             self,
             "ProductApi",
-            handler=lambdas,
+            handler=lambdas.product_lambda,
             proxy=False,
             rest_api_name="Product Service",
             description="This service serves product.",
@@ -39,7 +39,7 @@ class eShadhinApi(Construct):
         basket_api = cdk.aws_apigateway.LambdaRestApi(
             self,
             "BasketApi",
-            handler=lambdas,
+            handler=lambdas.basket_lambda,
             proxy=False,
             rest_api_name="Basket Service",
             description="This service serves basket.",
@@ -62,7 +62,7 @@ class eShadhinApi(Construct):
         order_api = cdk.aws_apigateway.LambdaRestApi(
             self,
             "OrderApi",
-            handler=lambdas,
+            handler=lambdas.order_lambda,
             proxy=False,
             rest_api_name="Order Service",
             description="This service serves order.",

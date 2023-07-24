@@ -2,7 +2,7 @@ import json
 import os
 import uuid
 import traceback
-from client import ddb_client as client
+from client import ddb_res_client as client
 from utils import DecimalEncoder
 
 table_name = os.environ["PRODUCT_TABLE_NAME"]
@@ -44,7 +44,6 @@ def lambda_handler(event, context):
                     "body": body,
                 },
                 cls=DecimalEncoder,
-                
             ),
         }
 
