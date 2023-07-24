@@ -9,7 +9,7 @@ To get started with the project, follow the steps below:
 1. Clone the repository to your local machine:
 
 ```
-git clone https://github.com/your-username/aws-cdk-python-ecomm.git
+git clone https://github.com/mubtasimfuad/aws-cdk-python-ecomm.git
 ```
 
 2. Install the required dependencies:
@@ -86,7 +86,7 @@ The project is structured as follows:
 ├── source.bat
 
 - `cdk.json`: Configuration file for AWS CDK.
-- `ecomm`: Main package containing the application code.
+- `cdk`: Main package containing the application code.
 - `backend`: Contains modules for backend services like API, database, lambdas, and queues.
 
 ## Functionality
@@ -110,7 +110,6 @@ You can now begin exploring the source code, contained in the hello directory.
 There is also a very trivial test included that can be run like this:
 
 ```
-$ pytest
 ```
 
 
